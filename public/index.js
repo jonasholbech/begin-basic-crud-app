@@ -1,3 +1,57 @@
+const completedDOM = document.querySelector("#js-completed");
+const todoDOM = document.querySelector("#js-todos");
+function init() {
+  fetch("/todos", {
+    method: "GET",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+    .then(body => body.json())
+    // Call update with fetched todos
+    .then(json => update(json.todos));
+}
+init();
+function update(todos) {
+  /*
+    {
+  "text": "is this awesome?",
+  "created": 1582278954743,
+  "key": "w0KNkzWohG",
+  "table": "todos"
+}
+    */
+  console.log(todos);
+  todos.forEach(todo => {
+    const item = document.createElement("li");
+    item.textContent = todo.text;
+    item.addEventListener("click", e => markCompleted(todo));
+    if (todo.completed) {
+      completedDOM.appendChild(item);
+    } else {
+      todoDOM.appendChild(item);
+    }
+  });
+}
+
+function markCompleted(item) {
+  item.completed = false;
+  fetch("/todos", {
+    method: "post",
+    body: JSON.stringify(item),
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  }).then(res => {
+    if (res.status === 200) {
+    } else {
+      console.dir(res);
+    }
+  });
+}
+/*
 (function() {
   // Kick off the app
   init();
@@ -18,6 +72,7 @@
 
   // Update the DOM with data
   function update(todos) {
+    console.log(todos);
     let list = document.getElementById("js-todos");
     let completed = document.getElementById("js-completed");
     let message = document.getElementById("js-message");
@@ -72,89 +127,33 @@
 
     return `
 <li
-id="${id}"
-class="
-display-flex
-align-items-center
-border-bottom
-"
->
+id="${id}">
 <form
 action="/todos"
-method="POST"
-class="
-  min-width-0
-  display-flex
-  align-items-center
-  flex-grow-1
-"
->
+method="POST">
 <input
   type="checkbox"
   name="completed"
-  class="
-    width-16
-    margin-right-1
-    cursor-pointer
-  "
   ${checked}
 />
 <input
   type="text"
   name="text"
   value="${text}"
-  class="
-    min-width-0
-    flex-grow-1
-    border-none
-    line-height-64
-    color-royal
-    font-weight-normal
-    font-size-1
-    focus-outline-0
-  "
-/>
+  />
 <input type="hidden" name="key" value="${id}"/>
 <input type="hidden" name="created" value="${created}"/>
-<button
-  class="
-    padding-1
-    font-size-1
-    background-white
-    border-transparent
-    cursor-pointer
-    focus-border
-    focus-outline-0
-  "
->
-
-  <svg class="width-16 height-16 fill-royal">
-    <use href="#icon-save"></use>
-  </svg>
-</button>
+<button>Save</button>
 </form>
 <form
 action="/todos/delete"
 method="POST"
 >
 <input type="hidden" name="key" value="${id}" />
-<button
-  class="
-    padding-1
-    font-size-1
-    background-white
-    border-transparent
-    cursor-pointer
-    focus-border
-    focus-outline-0
-  "
->
-  <svg class="width-16 height-16 fill-royal">
-    <use href="#icon-trash"></use>
-  </svg>
-</button>
+<button>Delete</button>
 </form>
 </li>
     `;
   }
 })();
+*/
